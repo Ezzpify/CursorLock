@@ -69,15 +69,18 @@ namespace CursorLock
 
         private void _hotkey_KeyUp(object sender, KeyEventArgs e)
         {
-            if (_cursorFree)
+            if (e.KeyCode == Keys.F11)
             {
-                _cursorFree = false;
-                lockCursor();
-            }
-            else
-            {
-                _cursorFree = true;
-                Cursor.Clip = new Rectangle();
+                if (_cursorFree)
+                {
+                    _cursorFree = false;
+                    lockCursor();
+                }
+                else
+                {
+                    _cursorFree = true;
+                    Cursor.Clip = new Rectangle();
+                }
             }
         }
 

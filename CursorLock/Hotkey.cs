@@ -33,6 +33,8 @@ namespace CursorLock
         const int WM_KEYUP = 0x101;
         const int WM_SYSKEYDOWN = 0x104;
         const int WM_SYSKEYUP = 0x105;
+        
+        private keyboardHookProc hookProcDelegate;
         #endregion
 
         #region Instance Variables
@@ -63,6 +65,7 @@ namespace CursorLock
         /// </summary>
         public globalKeyboardHook()
         {
+            hookProcDelegate = hookProc;
             hook();
         }
 
@@ -83,7 +86,7 @@ namespace CursorLock
         public void hook()
         {
             IntPtr hInstance = LoadLibrary("User32");
-            hhook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
+            hhook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProcDelegate, hInstance, 0);
         }
 
         /// <summary>
@@ -103,25 +106,33 @@ namespace CursorLock
         /// <returns></returns>
         public int hookProc(int code, int wParam, ref keyboardHookStruct lParam)
         {
-            if (code >= 0)
+            try
             {
-                Keys key = (Keys)lParam.vkCode;
-                if (HookedKeys.Contains(key))
+                if (code >= 0)
                 {
-                    KeyEventArgs kea = new KeyEventArgs(key);
-                    if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
+                    Keys key = (Keys)lParam.vkCode;
+                    if (HookedKeys.Contains(key))
                     {
-                        KeyDown(this, kea);
+                        KeyEventArgs kea = new KeyEventArgs(key);
+                        if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null))
+                        {
+                            KeyDown(this, kea);
+                        }
+                        else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null))
+                        {
+                            KeyUp(this, kea);
+                        }
+                        if (kea.Handled)
+                            return 1;
                     }
-                    else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null))
-                    {
-                        KeyUp(this, kea);
-                    }
-                    if (kea.Handled)
-                        return 1;
                 }
+                return CallNextHookEx(hhook, code, wParam, ref lParam);
             }
-            return CallNextHookEx(hhook, code, wParam, ref lParam);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                return -1;
+            }
         }
         #endregion
 

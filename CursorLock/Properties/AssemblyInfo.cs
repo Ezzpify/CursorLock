@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("CursorLock")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Locks the cursor from leaving the active screen if certain applications are in the foreground")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("CursorLock")]

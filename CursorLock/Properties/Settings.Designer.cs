@@ -33,5 +33,17 @@ namespace CursorLock.Properties {
                 this["windowlist"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ignoreupdate {
+            get {
+                return ((bool)(this["ignoreupdate"]));
+            }
+            set {
+                this["ignoreupdate"] = value;
+            }
+        }
     }
 }

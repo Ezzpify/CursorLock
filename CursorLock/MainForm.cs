@@ -26,7 +26,6 @@ namespace CursorLock
         [DllImport("user32.dll")]
         private static extern bool ReleaseCapture();
 
-        private const string _regKeyPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
         private globalKeyboardHook _hotkey = new globalKeyboardHook();
         private List<string> _windowList = new List<string>();
         private bool _taskbarNotificationShown;
@@ -61,6 +60,7 @@ namespace CursorLock
                     MessageBoxIcon.Error);
             }
 
+            lblVersion.Text = Application.ProductVersion;
             loadSettings();
 
             _hotkey.HookedKeys.Add(Keys.F11);
@@ -178,6 +178,30 @@ namespace CursorLock
             lockCursor();
         }
 
+        private void updateTimer_Tick(object sender, EventArgs e)
+        {
+            updateTimer.Enabled = false;
+            if (Properties.Settings.Default.ignoreupdate)
+                return;
+
+            if (UpdateCheck.IsUpdateAvailable())
+            {
+                DialogResult dialogResult = MessageBox.Show("There's an update available for CursorLock.\n"
+                    + "Click Yes and you will be redirected to the download page.\n\n"
+                    + "Click Cancel if you don't want to be notified of updates.", "CursorLock update", MessageBoxButtons.YesNoCancel);
+
+                if (dialogResult == DialogResult.Yes)
+                {
+                    Process.Start("https://github.com/Ezzpify/CursorLock/releases/latest");
+                }
+                else if (dialogResult == DialogResult.Cancel)
+                {
+                    Properties.Settings.Default.ignoreupdate = true;
+                    Properties.Settings.Default.Save();
+                }
+            }
+        }
+
         private void txtInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -194,7 +218,7 @@ namespace CursorLock
             try
             {
                 string currentProcessName = Process.GetCurrentProcess().ProcessName;
-                var regKey = Registry.CurrentUser.OpenSubKey(_regKeyPath, true);
+                var regKey = Registry.CurrentUser.OpenSubKey(Const.REGISTRYKEY_PATH, true);
 
                 if (cbAutostart.Checked)
                     regKey.SetValue(currentProcessName, Application.ExecutablePath);
@@ -264,7 +288,7 @@ namespace CursorLock
             _windowList = Properties.Settings.Default.windowlist.Cast<string>().ToList();
             refreshWindowList();
 
-            var regKey = Registry.CurrentUser.OpenSubKey(_regKeyPath, true);
+            var regKey = Registry.CurrentUser.OpenSubKey(Const.REGISTRYKEY_PATH, true);
             cbAutostart.Checked = regKey.GetValue(Process.GetCurrentProcess().ProcessName) != null;
         }
 

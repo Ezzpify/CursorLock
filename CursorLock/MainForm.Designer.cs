@@ -46,6 +46,8 @@
             this.picGithub = new System.Windows.Forms.PictureBox();
             this.lblGithub = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.updateTimer = new System.Windows.Forms.Timer(this.components);
+            this.lblVersion = new System.Windows.Forms.Label();
             this.notifyIconMenu.SuspendLayout();
             this.panelMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picGithub)).BeginInit();
@@ -168,6 +170,7 @@
             // panelMenu
             // 
             this.panelMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.panelMenu.Controls.Add(this.lblVersion);
             this.panelMenu.Controls.Add(this.btnHide);
             this.panelMenu.Controls.Add(this.picGithub);
             this.panelMenu.Dock = System.Windows.Forms.DockStyle.Top;
@@ -228,6 +231,24 @@
             this.label1.TabIndex = 10;
             this.label1.Text = "Manually unlock/lock cursor using F11";
             // 
+            // updateTimer
+            // 
+            this.updateTimer.Enabled = true;
+            this.updateTimer.Interval = 5000;
+            this.updateTimer.Tick += new System.EventHandler(this.updateTimer_Tick);
+            // 
+            // lblVersion
+            // 
+            this.lblVersion.AutoSize = true;
+            this.lblVersion.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.lblVersion.ForeColor = System.Drawing.Color.Gray;
+            this.lblVersion.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblVersion.Location = new System.Drawing.Point(32, 9);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(31, 13);
+            this.lblVersion.TabIndex = 11;
+            this.lblVersion.Text = "1.1.1";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -254,6 +275,7 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.notifyIconMenu.ResumeLayout(false);
             this.panelMenu.ResumeLayout(false);
+            this.panelMenu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picGithub)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -277,6 +299,8 @@
         private System.Windows.Forms.Button btnHide;
         private System.Windows.Forms.Label lblGithub;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Timer updateTimer;
+        private System.Windows.Forms.Label lblVersion;
     }
 }
 

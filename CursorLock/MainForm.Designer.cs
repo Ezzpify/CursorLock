@@ -45,6 +45,7 @@
             this.btnHide = new System.Windows.Forms.Button();
             this.picGithub = new System.Windows.Forms.PictureBox();
             this.lblGithub = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.notifyIconMenu.SuspendLayout();
             this.panelMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picGithub)).BeginInit();
@@ -53,7 +54,7 @@
             // gameTimer
             // 
             this.gameTimer.Enabled = true;
-            this.gameTimer.Interval = 5000;
+            this.gameTimer.Interval = 2000;
             this.gameTimer.Tick += new System.EventHandler(this.gameTimer_Tick);
             // 
             // txtInput
@@ -215,12 +216,25 @@
             this.lblGithub.MouseEnter += new System.EventHandler(this.lblGithub_MouseEnter);
             this.lblGithub.MouseLeave += new System.EventHandler(this.lblGithub_MouseLeave);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.label1.ForeColor = System.Drawing.Color.Silver;
+            this.label1.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label1.Location = new System.Drawing.Point(19, 355);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(190, 13);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Manually unlock/lock cursor using F11";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(227, 373);
+            this.ClientSize = new System.Drawing.Size(227, 390);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.lblGithub);
             this.Controls.Add(this.panelMenu);
             this.Controls.Add(this.btnFind);
@@ -236,6 +250,7 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "CursorLock";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.notifyIconMenu.ResumeLayout(false);
             this.panelMenu.ResumeLayout(false);
@@ -261,6 +276,7 @@
         private System.Windows.Forms.PictureBox picGithub;
         private System.Windows.Forms.Button btnHide;
         private System.Windows.Forms.Label lblGithub;
+        private System.Windows.Forms.Label label1;
     }
 }
 

@@ -15,23 +15,22 @@ namespace CursorLock
     public partial class MainForm : Form
     {
         [DllImport("user32.dll")]
-        static extern IntPtr GetForegroundWindow();
+        private static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
-        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
         [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hwnd, ref Rectangle rectangle);
+        private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
         [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-
-        [DllImport("user32.dll")]
-        public static extern bool ReleaseCapture();
+        private static extern bool ReleaseCapture();
 
         private const string _regKeyPath = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+        private globalKeyboardHook _hotkey = new globalKeyboardHook();
         private List<string> _windowList = new List<string>();
         private bool _taskbarNotificationShown;
+        private bool _cursorFree = false;
 
         private const int WM_NCLBUTTONDOWN = 0xA1;
         private const int HT_CAPTION = 0x2;
@@ -63,6 +62,23 @@ namespace CursorLock
             }
 
             loadSettings();
+
+            _hotkey.HookedKeys.Add(Keys.F11);
+            _hotkey.KeyUp += _hotkey_KeyUp;
+        }
+
+        private void _hotkey_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (_cursorFree)
+            {
+                _cursorFree = false;
+                lockCursor();
+            }
+            else
+            {
+                _cursorFree = true;
+                Cursor.Clip = new Rectangle();
+            }
         }
 
         private void panelMenu_MouseDown(object sender, MouseEventArgs e)
@@ -77,9 +93,10 @@ namespace CursorLock
         private void btnHide_Click(object sender, EventArgs e)
         {
             Hide();
+
             if (!_taskbarNotificationShown)
             {
-                makeBallonPopup("I'm down here.", 1000);
+                makeBallonPopup("Running minimized.", 1000);
                 _taskbarNotificationShown = true;
             }
         }
@@ -87,8 +104,9 @@ namespace CursorLock
         private void btnAdd_Click(object sender, EventArgs e)
         {
             string input = txtInput.Text;
+
             if (!string.IsNullOrWhiteSpace(input))
-                addWindowToList(txtInput.Text);
+                addWindowToList(input);
             else
             {
                 MessageBox.Show("Enter a window name into the box or press Find to select from an active window.",
@@ -134,6 +152,12 @@ namespace CursorLock
             Environment.Exit(1);
         }
 
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            refreshWindowList();
+            Cursor.Clip = new Rectangle();
+        }
+
         private void lblGithub_Click(object sender, EventArgs e)
         {
             Process.Start("https://github.com/Ezzpify");
@@ -151,19 +175,7 @@ namespace CursorLock
 
         private void gameTimer_Tick(object sender, EventArgs e)
         {
-            var handle = GetForegroundWindow();
-            var windowName = getWindowName(handle);
-            var screen = Screen.FromHandle(handle);
-
-            if (_windowList.Contains(windowName))
-            {
-                if (Cursor.Clip != screen.WorkingArea)
-                    Cursor.Clip = screen.Bounds;
-            }
-            else
-            {
-                Cursor.Clip = new Rectangle();
-            }
+            lockCursor();
         }
 
         private void txtInput_KeyDown(object sender, KeyEventArgs e)
@@ -189,12 +201,34 @@ namespace CursorLock
                 else
                     regKey.DeleteValue(currentProcessName);
             }
-            catch (Exception ex)
+            catch
             {
                 MessageBox.Show("Could not modify the registry. Run me as adminstrator to change the autostart option.", 
                     "CursorLock",
                     MessageBoxButtons.OK, 
                     MessageBoxIcon.Error);
+            }
+        }
+
+        private void lockCursor()
+        {
+            if (_cursorFree)
+                return;
+
+            var handle = GetForegroundWindow();
+            var windowName = getWindowName(handle);
+            var screen = Screen.FromHandle(handle);
+
+            if (_windowList.Contains(windowName))
+            {
+                if (Cursor.Clip != screen.Bounds)
+                {
+                    Cursor.Clip = screen.Bounds;
+                }
+            }
+            else
+            {
+                Cursor.Clip = new Rectangle();
             }
         }
 
